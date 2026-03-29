@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Sensitive files
+application-local.properties
+*.key
+*.pem
+*.log

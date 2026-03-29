@@ -2,6 +2,9 @@ package com.example.academify.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "user_profile2")
@@ -11,15 +14,21 @@ public class UserProfile {
     private Long id;
 
     @Column(name = "ad")
+    @NotBlank(message = "Ad boş olamaz")
     private String ad;
 
     @Column(name = "soyad")
+    @NotBlank(message = "Soyad boş olamaz")
     private String soyad;
 
     @Column(name = "email")
+    @NotBlank(message = "Email boş olamaz")
+    @Email(message = "Geçerli bir email adresi giriniz")
     private String email;
 
     @Column(name = "sifre")
+    @NotBlank(message = "Şifre boş olamaz")
+    @Size(min = 6, message = "Şifre en az 6 karakter olmalıdır")
     private String sifre;
 
     @Column(name = "faculty")

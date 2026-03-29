@@ -3,6 +3,8 @@ package com.example.academify.controller;
 
 import com.example.academify.model.UserProfile;
 import com.example.academify.repository.UserProfileRepository;
+import com.example.academify.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,9 @@ public class UserProfileController {
     @Autowired
     private UserProfileRepository userProfileRepository;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping
     public List<UserProfile> getAllUserProfiles() {
         return this.userProfileRepository.findAll();
@@ -29,11 +34,7 @@ public class UserProfileController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String resetCode, @RequestParam String newPassword) {
-        Optional<UserProfile> user = userProfileRepository.findByEmail(email);
-        if (user.isPresent() && user.get().getResetCode().equals(resetCode)) {
-            user.get().setSifre(newPassword);
-            user.get().setResetCode(null);
-            userProfileRepository.save(user.get());
+        if (userService.resetUserPassword(email, resetCode, newPassword)) {
             return ResponseEntity.ok("Şifre başarıyla güncellendi.");
         } else {
             return ResponseEntity.badRequest().body("Geçersiz sıfırlama kodu veya kullanıcı.");
@@ -41,14 +42,14 @@ public class UserProfileController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, Object>> register(@RequestBody UserProfile user) {
+    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody UserProfile user) {
         Map<String, Object> response = new HashMap<>();
 
-        if (userProfileRepository.findByEmail(user.getEmail()).isPresent()) {
+        if (userService.findByEmail(user.getEmail()).isPresent()) {
             response.put("success", false);
             response.put("message", "There is already an account with this email");
         } else {
-            userProfileRepository.save(user);
+            userService.registerUser(user);
             response.put("success", true);
             response.put("message", "Registration successful");
         }
@@ -60,9 +61,9 @@ public class UserProfileController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(@RequestBody UserProfile loginUser) {
         Map<String, Object> response = new HashMap<>();
-        Optional<UserProfile> user = userProfileRepository.findByEmail(loginUser.getEmail());
+        Optional<UserProfile> user = userService.findByEmail(loginUser.getEmail());
 
-        if (user.isPresent() && user.get().getSifre().equals(loginUser.getSifre())) {
+        if (user.isPresent() && userService.authenticateUser(loginUser.getEmail(), loginUser.getSifre())) {
             response.put("success", true);
             response.put("message", "Giriş başarılı.");
             response.put("ad", user.get().getAd()); // Add name
