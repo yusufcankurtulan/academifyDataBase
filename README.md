@@ -149,6 +149,6 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 
 ## İletişim
 
-Yusuf Can Kurtulan - yusufcankurtulan@github.com
+Yusufcan Kurtulan - yusufcankurtulan@github.com
 
 Proje Linki: [https://github.com/yusufcankurtulan/academifyDataBase](https://github.com/yusufcankurtulan/academifyDataBase)
